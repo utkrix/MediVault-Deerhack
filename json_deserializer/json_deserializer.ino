@@ -18,7 +18,7 @@ void setup() {
     Serial.println("Connected to");
     Serial.println(WiFi.localIP());
 
-    //server.on("/test",HTTP_GET,sendData);
+    server.on("/test",HTTP_GET,sendData);
 
     server.on("/test",HTTP_POST,receiveData);
 
@@ -59,12 +59,28 @@ void receiveData(){
     return;
 
   }
-  else{
-   if(JSONData.containsKey("number")){ 
-    server.send(200,"application/json",String(JSONData["number"].as<int>())+" Received");
-   }
-   else{
-     server.send(400,"application/json","Bad JSON");
-   }
+  // else{
+  //  if(JSONData.containsKey("name"))
+  //  { 
+  //   server.send(200,"application/json",String(JSONData["name"].as<String>())+" Received");
+  //  }
+  //  else{
+  //    server.send(400,"application/json","Bad JSON");
+  //  }
+  // }
+  const char* name = JSONData["name"];
+  Serial.println(name);
+
+  JsonArray dayArray = JSONData["day"];
+  
+  for (int i = 0; i < dayArray.size(); i++) {
+    String day = dayArray[i];
+    Serial.println(day);
+  }
+
+  JsonArray timeArray = JSONData["time"];
+  for (int i = 0; i < timeArray.size(); i++) {
+    String time = timeArray[i];
+    Serial.println(time);
   }
 }
