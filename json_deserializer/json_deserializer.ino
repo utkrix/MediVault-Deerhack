@@ -6,10 +6,15 @@
 const char *ssid     = "DWIT-Hotspot";
 const char *password = "@DWZone-hotspot1";
 
+#define led D4
+
+
 ESP8266WebServer server(80);
+
 
 void setup() {
   Serial.begin(9600);
+  pinMode(led, OUTPUT);
   WiFi.begin(ssid,password);
     while(WiFi.status() != WL_CONNECTED){
       Serial.println("Connecting");
