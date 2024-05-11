@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Form</title>
+</head>
+<body>
+    <h2>Upload Form</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div>
+            <label for="jsonData">JSON Data:</label>
+            <textarea id="jsonData" name="jsonData" rows="4" cols="50"></textarea>
+        </div>
+        <div>
+            <label for="imageFile">Image File:</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*">
+        </div>
+        <button type="submit">Upload</button>
+    </form>
+<script>
+    const jsonData = {
+        "patient_id": "Hello",
+        "doctor": "Utx",
+        "diagnosis": "clear",
+        "treatment": "idk",
+        "timestamp": 12,
+        "image_cid":"what"
+    };
+
+    document.getElementById("uploadForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append("jsonData", JSON.stringify(jsonData));
+
+        const imageFile = document.getElementById("imageFile").files[0];
+        formData.append("imageFile", imageFile);
+        try {
+            const response = await fetch("http://0.0.0.0:1984/api/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            const data = await response.json();
+            console.log("Upload successful:", data);
+        } catch (error) {
+            console.error("Error uploading:", error);
+        }
+    });
+</script>
+</body>
+</html>
+
