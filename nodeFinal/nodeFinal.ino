@@ -89,7 +89,7 @@ void handleLED(int ledPin) {
     }
   }
 }
-
+String formattedTime;
 void loop() {
   server.handleClient();
   timeClient.update();
@@ -109,8 +109,9 @@ void loop() {
 } 
   Serial.println(state1);
   Serial.println(state2);
+  formattedTime = timeClient.getFormattedTime();  
 
-  backend();
+backend();
   receiveData(day, time);
 }
 
@@ -136,6 +137,7 @@ void touchSensor(){
   }
 }
 
+
 void backend(){
   // Create a JSON document
   StaticJsonDocument<200> JSONData;
@@ -144,6 +146,8 @@ void backend(){
   JSONData["id"] = "0b149c78-b8d3-4a7c-963e-59b8b5932917";
   JSONData["sensitive"] = true;
   JSONData["dispensed"] = true;
+  Serial.println("BACKENDD!");
+  Serial.println(formattedTime);
   JSONData["time_elapsed"] = true;
 
   // Serialize the JSON document into a char array
@@ -179,6 +183,7 @@ void sendData(){
   // Populate the JSON document with data
   JSONData["notification"] = "Medicine Taken";
   JSONData["time"] = timeClient.getFormattedTime();
+
 
   // Serialize the JSON document into a char array
   char data[200];
@@ -278,6 +283,7 @@ void receiveData(String day, String time) {
               digitalWrite(pin, LOW);
             }else{
               handleLED(pin);
+              
               
             }
             return;
