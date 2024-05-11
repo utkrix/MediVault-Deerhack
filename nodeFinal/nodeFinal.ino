@@ -51,70 +51,61 @@ void sendData(){
 
 
 void receiveData(){
-  StaticJsonDocument<300> JSONData;
+    String jsonString = server.arg("plain");
+  Serial.println("Received JSON String:");
+  Serial.println(jsonString);
 
-  String jsonString = server.arg("plain");
+  StaticJsonDocument<1024> JSONData;
+
   DeserializationError error = deserializeJson(JSONData, jsonString);
-
 
   if (error) {
     Serial.print("deserializeJson() failed: ");
     Serial.println(error.f_str());
-    server.send(500,"application/json","Error in parsing"); 
+    server.send(500, "application/json", "Error in parsing");
     return;
-
-  }
-  const char* name = JSONData["name"];
-  Serial.println(name);
-
-  JsonArray dayArray = JSONData["day"];
-  int dayArraySize =  dayArray.size();
-  // Serial.println(dayArraySize);
-  String day[dayArraySize];
-
-  for (int i = 0; i < dayArraySize; i++){
-    // day data stored in day array
-
-    day[i] = dayArray[i].as<String>();
   }
 
-  //traverse and find correct to blink
-  Serial.println("Days:");
-  for (int i = 0; i < dayArraySize; i++) {
-  Serial.println(day[i]);
-}
+  JsonArray dataArray = JSONData["data"];
+  int dataSize = dataArray.size();
 
-  JsonArray timeArray = JSONData["time"];
-  int timeArraySize =  timeArray.size();
-  // Serial.println(timeArraySize);
-  String time[timeArraySize];
+  Serial.print("Number of data sets received: ");
+  Serial.println(dataSize);
 
-  Serial.println("Timings:");
-  for (int i = 0; i < timeArray.size(); i++) {
-    // data stored in time array
-    time[i] = timeArray[i].as<String>();
-  }
-  // int highest = 0;
+  for (int i = 0; i < dataSize; i++) {
+    JsonObject obj = dataArray[i];
+    Serial.print("Processing data set ");
+    Serial.println(i + 1); // Print index starting from 1
 
-  // if (timeArraySize > dayArraySize){
-  //   highest = timeArraySize;
-  // }
-  // else{
-  //   highest = dayArraySize;
-  // }
-// traverse later and find correct to blinkr
+    const char* name = obj["name"];
+    Serial.print("Name: ");
+    Serial.println(name);
 
-  for (int i = 0; i < timeArraySize; i++) {
-    Serial.println(time[i]);
-  }
+    JsonArray dayArray = obj["day"];
+    int dayArraySize = dayArray.size();
+    Serial.print("Number of days: ");
+    Serial.println(dayArraySize);
+    Serial.println("Days:");
+    for (int j = 0; j < dayArraySize; j++) {
+      Serial.println(dayArray[j].as<String>());
+    }
 
+    JsonArray timeArray = obj["time"];
+    int timeArraySize = timeArray.size();
+    Serial.print("Number of times: ");
+    Serial.println(timeArraySize);
+    Serial.println("Times:");
+    for (int j = 0; j < timeArraySize; j++) {
+      Serial.println(timeArray[j].as<String>());
+    }
+  
   for (int i = 0; i < dayArraySize; i++)
   {
-    if (day[i] == "Monday")
+    if (dayArray[i] == "Tuesday")
     {
       for (int o = 0; o < timeArraySize; o++)
       {
-        if (time[o] == "22:00:00")
+        if (timeArray[o] == "14:00:00")
         {
           for(int n = 0; n < 15; n++)
           {
@@ -123,8 +114,12 @@ void receiveData(){
             digitalWrite(led, LOW);
             delay(300);
           }
+
+          de
         }
       }
     }
   }
+  }
 }
+
