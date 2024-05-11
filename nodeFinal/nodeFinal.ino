@@ -2,6 +2,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
+#include <NTPClient.h>
+// #include <Ticker.h>
+
 
 const char *ssid = "DWIT-Hotspot";
 const char *password = "@DWZone-hotspot1";
@@ -12,14 +15,21 @@ const char *password = "@DWZone-hotspot1";
 #define touch1 D7
 #define touch2 D8
 
-unsigned long previousMillis = 0;
-const long interval = 300;
 
+
+const long utcOffsetInSeconds = 19620;
+
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
 ESP8266WebServer server(80);
 
-int dayArraySize;
-int timeArraySize;
+
+void handleLED(int);
+// Ticker timer1(handleLED(int), 0, 1);
+
 
 void setup() {
   Serial.begin(9600);
@@ -35,15 +45,33 @@ void setup() {
   Serial.println("Connected to");
   Serial.println(WiFi.localIP());
 
+  // timer1.start();
+
   server.on("/test", HTTP_GET, sendData);
 
   server.on("/test", HTTP_POST, receiveData);
 
+  timeClient.begin();
   server.begin();
+
+  // Timer1.initialize(interval * 1000); // Microseconds for desired interval
+  // Timer1.attachInterrupt(blinkLEDs);
+  // Timer1.start();
 }
 
 void loop() {
+  
   server.handleClient();
+
+  timeClient.update();
+  
+  String date = daysOfTheWeek[timeClient.getDay()];
+  String time = timeClient.getFormattedTime();
+
+  String currTime = (date+ " " + time);
+  Serial.println(currTime);
+  delay(1000);
+  // timer1.update();
 }
 
 // to send data to api
@@ -72,22 +100,6 @@ void touchSensor(){
 
 // Function to handle LED blinking
 void handleLED(int led) {
-  
-  // code for millis NA
-
-  // const long interval = 300;
-  // static bool ledState = LOW; // Initial state: LOW (off)
-  // static unsigned long millisSinceLastBlink = 0; // Time since last blink
-  // unsigned long currentMillis = millis();
-
-  // // Check if it's time to toggle (based on interval)
-  // if (currentMillis - millisSinceLastBlink >= interval) {
-  //   millisSinceLastBlink = currentMillis;
-
-  //   // Toggle LED state and control pin
-  //   ledState = !ledState;
-  //   digitalWrite(led, ledState);
-  // }
   for (int i=0; i < 15; i++)
   {
     digitalWrite(led, HIGH);
@@ -138,7 +150,7 @@ void receiveData() {
     }
 
     JsonArray timeArray = obj["time"];
-    timeArraySize = timeArray.size();
+    int timeArraySize = timeArray.size();
     Serial.print("Number of times: ");
     Serial.println(timeArraySize);
     Serial.println("Times:");
@@ -151,9 +163,8 @@ void receiveData() {
           if (timeArray[o] == "14:00:00") {
             handleLED(led1);
             touchSensor();
-            // checking if sensor is activated after consumption
             }
-          if (timeArray[o] == "23:00:00"){
+          if (timeArray[o] == "14:00:00"){
             handleLED(led2);
             touchSensor();
           }
