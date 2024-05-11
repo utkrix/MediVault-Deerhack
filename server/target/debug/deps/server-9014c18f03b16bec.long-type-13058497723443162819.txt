@@ -1,1 +1,0 @@
-for<'a, 'b> fn(&'a actix_web::web::Json<MedicineDispensed>, &'b mut DispenserSchema) -> impl std::future::Future<Output = ()> {medicine_dispense}
