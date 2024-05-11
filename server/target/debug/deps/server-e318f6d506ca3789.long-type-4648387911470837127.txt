@@ -1,0 +1,1 @@
+fn(Data<Client>, Json<MedicineDispensed>, actix_web::web::Query<Info>) -> impl std::future::Future<Output = HttpResponse> {medicine_quantity}
