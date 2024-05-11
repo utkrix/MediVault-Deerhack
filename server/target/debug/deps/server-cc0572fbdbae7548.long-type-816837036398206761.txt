@@ -1,0 +1,1 @@
+fn(Data<Client>, actix_web::web::Query<Info>) -> impl std::future::Future<Output = HttpResponse> {dispenser_data}
