@@ -7,6 +7,8 @@ const char *ssid     = "DWIT-Hotspot";
 const char *password = "@DWZone-hotspot1";
 
 #define led D4
+#define touch1 D7
+#define touch2 D8
 
 
 ESP8266WebServer server(80);
@@ -15,6 +17,8 @@ ESP8266WebServer server(80);
 void setup() {
   Serial.begin(9600);
   pinMode(led, OUTPUT);
+  pinMode(touch1, INPUT);
+  pinMode(touch2, INPUT);
   WiFi.begin(ssid,password);
     while(WiFi.status() != WL_CONNECTED){
       Serial.println("Connecting");
@@ -114,8 +118,17 @@ void receiveData(){
             digitalWrite(led, LOW);
             delay(300);
           }
+          
+          // checking if sensor is activated after consumption
+          int state1 = digitalRead(touch1);
+          Serial.println(state1);
+          int state2 = digitalRead(touch2);
+          Serial.println(state2);
+          if (state1 == state2 == 1)
+          {
+            Serial.println("Touched!");
+          }
 
-          de
         }
       }
     }
